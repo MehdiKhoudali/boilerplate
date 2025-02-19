@@ -82,7 +82,7 @@ export default function RootLayout({
 					<Session>
 						<ThemeProvider
 							attribute="class"
-							defaultTheme="system"
+							defaultTheme="light"
 							enableSystem
 							disableTransitionOnChange
 						>

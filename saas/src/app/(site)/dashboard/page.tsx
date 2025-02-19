@@ -1,30 +1,32 @@
-import AreaChartStats from "@/src/components/charts/AreaChart";
-import DonutChartStats from "@/src/components/charts/DonutChart";
-import DashboardStats from "@/src/components/common/DashboardStats";
-import Title, { Subtitle } from "@/src/components/common/Title";
-import { getCurrentUser } from "@/src/lib/session";
+"use client";
+import { PageHeader } from "@/src/components/ui/page-header";
+import { Plus } from "lucide-react";
 
-const Dashboard = async () => {
-	const user = await getCurrentUser();
-	return (
-		<div className="flex flex-col items-start w-full h-full p-6 overflow-y-auto">
-			<div className="flex items-start flex-col gap-6 w-full h-full">
-				<div className="flex items-start justify-start w-full gap-2 flex-col">
-					<Title className="md:text-4xl">Welcome, {user?.name}</Title>
-					<Subtitle>
-						Have a nice day, and don't forget to drink water! 🥤
-					</Subtitle>
-				</div>
-				<div className="flex flex-col items-start w-full gap-4">
-					<DashboardStats />
-					<div className="flex items-start w-full gap-4 lg:flex-row flex-col">
-						<AreaChartStats />
-						<DonutChartStats />
-					</div>
-				</div>
-			</div>
-		</div>
-	);
+const Dashboard = () => {
+  return (
+    <div className="">
+      <PageHeader
+        title="Dashboard"
+        subtitle="Monitor everything here"
+        actions={[
+          {
+            label: "Create new",
+            icon: <Plus className="h-4 w-4" />,
+            onClick: () => {
+              /* Add your handler */
+            },
+          },
+          {
+            label: "Update your plan",
+            variant: "outline",
+            onClick: () => {
+              /* Add your handler */
+            },
+          },
+        ]}
+      />
+    </div>
+  );
 };
 
 export default Dashboard;
