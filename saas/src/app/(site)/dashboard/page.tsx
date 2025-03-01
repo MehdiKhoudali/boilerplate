@@ -20,7 +20,6 @@ const Dashboard = () => {
             label: "Update your plan",
             variant: "outline",
             onClick: () => {
-              /* Add your handler */
             },
           },
         ]}
