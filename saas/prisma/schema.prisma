@@ -45,6 +45,70 @@ model Session {
   @@map(name: "sessions")
 }
 
+model Organization {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  description   String?
+  logo          String?
+  createdAt     DateTime @default(now()) @map(name: "created_at")
+  updatedAt     DateTime @default(now()) @map(name: "updated_at")
+  
+  // Billing information
+  billingEmail  String?
+  billingName   String?
+  billingAddress String?
+  
+  // Settings
+  settings      Json?
+  
+  // Relationships
+  users         OrganizationUser[]
+  files         File[]
+  messages      Message[]
+  markdowns     Markdown[]
+
+  // Creator relationship
+  createdBy     User     @relation("CreatedOrganizations", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  createdById   String
+  
+  // Default organization for users
+  defaultForUsers User[] @relation("DefaultOrganization")
+
+  @@map(name: "organizations")
+  @@index([createdById])
+}
+
+enum OrganizationUserRole {
+  OWNER
+  ADMIN
+  MEMBER
+  GUEST
+}
+
+model OrganizationUser {
+  id             String               @id @default(cuid())
+  role           OrganizationUserRole @default(MEMBER)
+  createdAt      DateTime             @default(now()) @map(name: "created_at")
+  updatedAt      DateTime             @default(now()) @map(name: "updated_at")
+  
+  // Invitation status
+  invitationToken String?             @unique
+  invitationAccepted Boolean          @default(false)
+  invitationSentAt DateTime?
+  
+  // Relationships
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+
+  @@unique([organizationId, userId])
+  @@map(name: "organization_users")
+  @@index([organizationId])
+  @@index([userId])
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -68,8 +132,17 @@ model User {
   credits Int @default(10)
 
   markdowns Markdown[]
+  
+  // Organization relationships
+  organizations         OrganizationUser[]
+  createdOrganizations  Organization[]     @relation("CreatedOrganizations")
+  
+  // Default organization (if any)
+  defaultOrganization   Organization?      @relation("DefaultOrganization", fields: [defaultOrganizationId], references: [id], onDelete: SetNull, onUpdate: Restrict)
+  defaultOrganizationId String?
 
   @@map(name: "users")
+  @@index([defaultOrganizationId])
 }
 
 model Markdown {
@@ -80,9 +153,14 @@ model Markdown {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
+  
+  // Organization relationship
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
 
   @@map(name: "markdowns")
   @@index([userId])
+  @@index([organizationId])
 }
 
 enum UploadStatus {
@@ -106,9 +184,14 @@ model File {
 
   User User? @relation(fields: [userId], references: [id])
   userId String?
+  
+  // Organization relationship
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
 
   @@map(name: "files")
   @@index([userId])
+  @@index([organizationId])
 }
 
 model Message {
@@ -123,10 +206,15 @@ model Message {
   fileId    String?
   User      User?         @relation(fields: [userId], references: [id])
   userId    String?
+  
+  // Organization relationship
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
 
   @@map(name: "messages")
   @@index([fileId])
   @@index([userId])
+  @@index([organizationId])
 }
 
 model VerificationToken {

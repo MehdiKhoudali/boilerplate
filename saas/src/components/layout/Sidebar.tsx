@@ -48,12 +48,19 @@ import {
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
+import { OrganizationSwitcher } from "@/src/components/ui/organization-switcher";
+import { useOrganization } from "@/src/hooks/use-organization";
 
 const GeneralLinks = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Organizations",
+    href: "/org",
+    icon: Users,
   },
   {
     title: "Pricing",
@@ -65,7 +72,6 @@ const GeneralLinks = [
     href: "/profile",
     icon: User,
   },
-  
 ];
 
 const CompanyLinks = [
@@ -83,6 +89,7 @@ const CompanyLinks = [
 
 const AppSidebar = () => {
   const { data: session } = useSession();
+  const { currentOrganization } = useOrganization();
 
   return (
     <SidebarProvider>
@@ -97,6 +104,10 @@ const AppSidebar = () => {
               <span className="text-xs text-muted-foreground ml-auto">v1.0</span>
             </div>
           </SidebarHeader>
+
+          <div className="px-4 py-2">
+            <OrganizationSwitcher />
+          </div>
 
           <SidebarContent className="px-2">
             <SidebarGroup>
